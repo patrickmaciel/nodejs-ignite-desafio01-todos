@@ -39,36 +39,38 @@ app.post('/users', (request, response) => {
     return response.status(400).json({ error: 'User already exists'});
   }
   
-  users.push({
+  const newUser = {
     id: uuidv4(),
     name,
     username,
     todos: []
-  });
+  };
+  users.push(newUser);
   
-  return response.status(200).send();
+  return response.status(201).json(newUser);
 });
 
 
 app.get('/todos', checksExistsUserAccount, (request, response) => {
   const { user } = request;
   
-  return response.json({ todos: user.todos });
+  return response.json(user.todos);
 });
 
 app.post('/todos', checksExistsUserAccount, (request, response) => {
   const { title, deadline } = request.body;
   const { user } = request;
   
-  user.todos.push({
+  const todo = {
     id: uuidv4(),
-    title,
-    done: false,
+      title,
+      done: false,
     deadline: new Date(deadline),
     created_at: new Date()
-  });
+  };
+  user.todos.push(todo);
   
-  return response.status(201).send();
+  return response.status(201).json(todo);
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
@@ -84,7 +86,7 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   user.todos[positionInArray].title = title;
   user.todos[positionInArray].deadline = deadline;
   
-  return response.json({ message: 'Todo updated!', todo: user.todos[positionInArray] });
+  return response.json(user.todos[positionInArray]);
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
@@ -98,7 +100,7 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   
   user.todos[positionInArray].done = true;
   
-  return response.json({ message: 'Todo mark as done!', todo: user.todos[positionInArray] });
+  return response.json(user.todos[positionInArray]);
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
